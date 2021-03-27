@@ -2,13 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const app = express();
+const Thing = require('./models/Things');
 
 mongoose.connect('mongodb+srv://alan:lVAGdrM2KUiFqOk9@firstnodeserver.c4lpm.mongodb.net/Node?retryWrites=true&w=majority',
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
+{ useNewUrlParser: true,
+  useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch((err) => console.log('Connexion à MongoDB échouée !', err));
+  
+const app = express();
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,10 +22,18 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.post('/api/stuff', (req, res, next) => {
-  console.log(req.body);
-  res.status(201).json({
-    message: 'Objet créé !'
+  // On supprime l'id généré par le front car MongoDB le génère auto
+  delete req.body._id;
+
+  const thing = new Thing({
+    // On déverse la totalité des champs du model Thing
+    ...req.body
   });
+
+  // La méthode save est fournie par le modèle grace à mongoose
+  thing.save()
+    .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+    .catch(error => res.status(400).json({ error }));
 });
 
 app.use('/api/stuff', (req, res, next) => {

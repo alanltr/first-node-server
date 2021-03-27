@@ -24,5 +24,29 @@ exports.signup = (req, res, next) => {
 }
 
 exports.login = (req, res, next) => {
-
+  User.findOne({ email: req.body.email})
+    .then(user => {
+      // Si l'utilisateur n'est pas trouvé :
+      if (!user) {
+        return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+      }
+      // Si utilisateur trouvé : on compare le mdp non hashé avec celui hashé en BDD
+      // Fonction Asynchrone | Renvoi un booléen nommé 'valid'
+      bcrypt.compare(req.body.password, user.password)
+        .then(valid => {
+          // Si mdp pas identiques
+          if (!valid) {
+            return res.status(401).json({ error: 'Mot de passe incorrect' });
+          }
+          // Si mdp identiques
+          return res.status(200).json({ 
+            userId: user._id,
+            token: 'TOKEN'
+          })
+        })
+        // Uniquement si erreur de connexion avec MongoDB | Erreur serveur
+        .catch(error => res.status(500).json({ error }));
+    })
+    // Uniquement si erreur de connexion avec MongoDB | Erreur serveur
+    .catch(error => res.status(500).json({ error }));
 }

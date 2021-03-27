@@ -42,6 +42,17 @@ app.post('/api/stuff', (req, res, next) => {
 });
 
 /**
+ * Méthode PUT
+ */
+ app.put('/api/stuff/:id', (req, res, next) => {
+   // 1er arg : l'id de l'objet à modifier
+   // 2ème arg : le nouvel objet (donc avec les modifs a faire en base)
+  Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
+/**
  * Méthode GET one by id
  */
 app.get('/api/stuff/:id', (req, res, next) => {

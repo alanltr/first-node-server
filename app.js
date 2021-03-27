@@ -53,6 +53,16 @@ app.post('/api/stuff', (req, res, next) => {
 });
 
 /**
+ * Méthode DELETE
+ */
+ app.delete('/api/stuff/:id', (req, res, next) => {
+   // Arg : l'id de l'objet à supprimer
+  Thing.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
+/**
  * Méthode GET one by id
  */
 app.get('/api/stuff/:id', (req, res, next) => {

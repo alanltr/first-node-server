@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const Thing = require('./models/Things');
 
+// Connexion avec la BDD
 mongoose.connect('mongodb+srv://alan:lVAGdrM2KUiFqOk9@firstnodeserver.c4lpm.mongodb.net/Node?retryWrites=true&w=majority',
 { useNewUrlParser: true,
   useUnifiedTopology: true })
@@ -12,6 +13,7 @@ mongoose.connect('mongodb+srv://alan:lVAGdrM2KUiFqOk9@firstnodeserver.c4lpm.mong
   
 const app = express();
 
+// Gestion des CORS
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -21,6 +23,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+/**
+ * Méthode POST
+ */
 app.post('/api/stuff', (req, res, next) => {
   // On supprime l'id généré par le front car MongoDB le génère auto
   delete req.body._id;
@@ -36,6 +41,9 @@ app.post('/api/stuff', (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 });
 
+/**
+ * Méthode GET one by id
+ */
 app.get('/api/stuff/:id', (req, res, next) => {
   // On lui précise en argument que le paramétre d'URL ':id' doit etre l'id de la thing récupérée
   Thing.findOne({ _id: req.params.id })
@@ -43,6 +51,9 @@ app.get('/api/stuff/:id', (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 });
 
+/**
+ * Méthode GET all
+ */
 app.get('/api/stuff', (req, res, next) => {
   // La méthode find() est fournie par le modèle
   Thing.find()

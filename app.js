@@ -36,7 +36,14 @@ app.post('/api/stuff', (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 });
 
-app.use('/api/stuff', (req, res, next) => {
+app.get('/api/stuff/:id', (req, res, next) => {
+  // On lui précise en argument que le paramétre d'URL ':id' doit etre l'id de la thing récupérée
+  Thing.findOne({ _id: req.params.id })
+    .then(thing => res.status(200).json(thing))
+    .catch(error => res.status(404).json({ error }));
+});
+
+app.get('/api/stuff', (req, res, next) => {
   // La méthode find() est fournie par le modèle
   Thing.find()
     .then(things => res.status(200).json(things))

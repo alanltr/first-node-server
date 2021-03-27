@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const path = require('path');
 
 // Import des router
 const stuffRoutes = require('./routes/stuff');
@@ -24,6 +25,13 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+
+// Middleware pour les requêtes d'images
+// express.static() permet d'accéder à un dossier statique
+// path est une méthode native node qui permet de récupérer le path 
+// join() y ajoute le __dirname càd le nom du dossier dans lequel on va se trouver
+//        et auquel on ajoute images. On a mtn le chemin complet du dossier images
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // On envoi les requetes de la route api/stuff vers le router stuffRoutes, donc dans le fichier stuff.js
 app.use('/api/stuff', stuffRoutes);

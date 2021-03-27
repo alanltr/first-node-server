@@ -40,6 +40,7 @@ const errorHandler = error => {
 const server = http.createServer(app);
 
 server.on('error', errorHandler);
+// Ecouteur d'évènements consignant le port ou le canal nommé sur lequel le serveur s'exécute dans la console.
 server.on('listening', () => {
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;

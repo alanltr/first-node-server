@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-// Import des router, c'est eux qui contiennent nos méthodes du CRUD
+// Import des router
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
 

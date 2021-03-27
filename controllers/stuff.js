@@ -1,4 +1,5 @@
 const Thing = require('../models/Thing');
+const fs = require('fs'); // fs pour file system permet d'accéder au système de fichiers
 
 
 // Méthode POST
@@ -25,7 +26,7 @@ exports.createThing = (req, res, next) => {
   thing.save() // Renvoi une promise
     .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
     .catch(error => res.status(400).json({ error }));
-}
+};
 
 // Méthode PUT
 exports.modifyThing = (req, res, next) => {
@@ -43,15 +44,28 @@ exports.modifyThing = (req, res, next) => {
  Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
    .catch(error => res.status(400).json({ error }));
-}
+};
 
 // Méthode DELETE
 exports.deleteThing = (req, res, next) => {
-  // Arg : l'id de l'objet à supprimer
- Thing.deleteOne({ _id: req.params.id })
-   .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-   .catch(error => res.status(400).json({ error }));
-}
+  // Avant de supprimer l'objet de la base on aller le chercher, pour avoir l'url de l'image
+  // ce qui nous donnera le nom du fichier pour le supprimer ensuite
+  Thing.findOne({ _id: req.params.id })
+    .then(thing => {
+      // Ici split() va récupérer uniquement le nom du fichier
+      const filename = thing.imageUrl.split('/images')[1];
+      // unlink() va supprimer le fichier
+      // 1er arg : le chemin du fichier
+      // 2eme arg : la callback, ici on place le DELETE en BDD
+      fs.unlink(`images/${filename}`, () => {
+        // Arg : l'id de l'objet à supprimer
+        Thing.deleteOne({ _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+        .catch(error => res.status(400).json({ error }));
+      });
+    })
+    .catch(error => res.status(500).json({ error }));
+};
 
 // Méthode GET one
 exports.getOneThing = (req, res, next) => {
@@ -59,7 +73,7 @@ exports.getOneThing = (req, res, next) => {
   Thing.findOne({ _id: req.params.id })
     .then(thing => res.status(200).json(thing))
     .catch(error => res.status(404).json({ error }));
-}
+};
 
 // Méthode GET all
 exports.getAllThing = (req, res, next) => {
@@ -67,14 +81,4 @@ exports.getAllThing = (req, res, next) => {
   Thing.find()
     .then(things => res.status(200).json(things))
     .catch(error => res.status(400).json({ error }));
-}
-
-
-// Méthode PUT avant UPLOAD
-// exports.modifyThing = (req, res, next) => {
-//   // 1er arg : l'id de l'objet à modifier
-//   // 2ème arg : le nouvel objet (donc avec les modifs a faire en base)
-//  Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-//    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-//    .catch(error => res.status(400).json({ error }));
-// }
+};

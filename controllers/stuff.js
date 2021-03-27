@@ -1,13 +1,24 @@
 const Thing = require('../models/Thing');
 
+
 // Méthode POST
 exports.createThing = (req, res, next) => {
+  // UPLOAD : si un fichier est envoyé cela change le corps de la requête
+  //          on a le corps de la requête sous forme de string, il faut donc
+  //          le remettre en objet Js. 
+  // req.body devient req.body.thing
+  const thingObject = JSON.parse(req.body.thing);
   // On supprime l'id généré par le front car MongoDB le génère auto
-  delete req.body._id;
+  delete thingObject._id;
 
   const thing = new Thing({
     // On déverse la totalité des champs du model Thing
-    ...req.body
+    ...thingObject,
+    // Il faut specifier le chemin de l'Url car c'est multer qui le génère
+    // On fournit le protocole (https, http)
+    // On fournit l'hote (localhost, 127.0.0.0 etc...)
+    // On fournit le nom du dossier ou sont contenus les fichiers
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   });
 
   // La méthode save est fournie par le modèle grace à mongoose
@@ -48,3 +59,32 @@ exports.getAllThing = (req, res, next) => {
     .then(things => res.status(200).json(things))
     .catch(error => res.status(400).json({ error }));
 }
+
+
+
+// Méthode POST avant UPLOAD
+// exports.createThing = (req, res, next) => {
+  
+//   // On supprime l'id généré par le front car MongoDB le génère auto
+//   delete req.body._id;
+
+//   const thing = new Thing({
+//     // On déverse la totalité des champs du model Thing
+//     ...req.body
+//   });
+
+//   // La méthode save est fournie par le modèle grace à mongoose
+//   thing.save() // Renvoi une promise
+//     .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+//     .catch(error => res.status(400).json({ error }));
+// }
+
+
+// Méthode PUT avant UPLOAD
+// exports.modifyThing = (req, res, next) => {
+//   // 1er arg : l'id de l'objet à modifier
+//   // 2ème arg : le nouvel objet (donc avec les modifs a faire en base)
+//  Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+//    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+//    .catch(error => res.status(400).json({ error }));
+// }

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 // Import des router, c'est eux qui contiennent nos méthodes du CRUD
 const stuffRoutes = require('./routes/stuff');
+const userRoutes = require('./routes/user');
 
 // Connexion avec la BDD
 mongoose.connect('mongodb+srv://alan:lVAGdrM2KUiFqOk9@firstnodeserver.c4lpm.mongodb.net/Node?retryWrites=true&w=majority',
@@ -26,5 +27,6 @@ app.use(bodyParser.json());
 
 // On envoi les requetes de la route api/stuff vers le router stuffRoutes, donc dans le fichier stuff.js
 app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;

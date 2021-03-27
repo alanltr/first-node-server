@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
@@ -40,8 +41,17 @@ exports.login = (req, res, next) => {
           }
           // Si mdp identiques
           return res.status(200).json({ 
+            // Ici les données qu'on renvoi au front
             userId: user._id,
-            token: 'TOKEN'
+            // La fonction sign() prend 3 arg :
+            // 1er : les données qu'on souhaite encoder, le payload
+            // 2ème : clé secète d'encodage (mettre une chaine longue et random pour la sécu++)
+            // 3ème : délai d'expiration du token
+            token: jwt.sign(
+              { userId: user._id },
+              'RANDOM_TOKEN_SECRET',
+              { expiresIn: '24h' }
+            )
           })
         })
         // Uniquement si erreur de connexion avec MongoDB | Erreur serveur
